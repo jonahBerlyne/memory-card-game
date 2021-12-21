@@ -10,21 +10,50 @@ import killerB from './images/killerb.jpg'
 import naruto from './images/naruto.jpg'
 import uniqid from 'uniqid';
 
-
 export default function App() {
   
-  const [score, setScore] = useState(0);
+  const [score, setScore] = useState(-1);
   
   function incrementScore() {
     setScore(prevScore => prevScore + 1);
   }
   
   let jinchuriki = [gaara, yugito, yagura, roshi, han, utakata, fuu, killerB, naruto];
+
   
   const [imgs, setImgs] = useState(jinchuriki);
-
+  
   function renderImages() {
-    return imgs.map(img => <img src={img} alt={img} key={uniqid()} onClick={incrementScore}/>);
+    return imgs.map((img, index) => <img src={img} alt={img} id={img} key={uniqid()} height="100" width="100" onClick={ gotClicked}/>);
+  }
+
+  const [clickedImg, setClickedImg] = useState(undefined);
+  const [clickedImgs, setClickedImgs] = useState([]);
+
+  function gotClicked(e) {
+    setClickedImg(e.target.id);
+  }
+
+  function checkImgs() {
+    if (clickedImgs == []) {
+      if (clickedImg !== undefined) {
+        clickedImgs.push(clickedImg);
+        setClickedImgs(clickedImgs);
+      }
+      return;
+    }
+    
+      
+    let found = clickedImgs.find(img => img == clickedImg);
+    if (found) {
+      setScore(-1);
+      setClickedImg(undefined);
+      setClickedImgs([]);
+    } else {
+      incrementScore();
+      clickedImgs.push(clickedImg);
+      setClickedImgs(clickedImgs);
+    }
   }
 
   const shuffleArray = array => {
@@ -36,12 +65,11 @@ export default function App() {
     }
   }
 
-  // console.log(shuffleArray(jinchuriki));
-
   useEffect(() => {
+    checkImgs();
     shuffleArray(jinchuriki);
     setImgs(jinchuriki);
-  }, [score]);
+  }, [clickedImg]);
   
   return (
     <div className="App">
